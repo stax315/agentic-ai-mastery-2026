@@ -1,0 +1,55 @@
+# Python                                                                        
+__pycache__/                                                                    
+*.py[cod]                                                                       
+*$py.class                                                                      
+*.so                                                                            
+.Python                                                                         
+venv/                                                                           
+env/                                                                            
+.venv/
+ENV/                                                                          
+                                                                                
+# Testing                                                                       
+.pytest_cache/                                                                  
+.coverage                                                                       
+htmlcov/                                                                        
+                                                                                
+# IDE                                                                           
+.idea/                                                                          
+.vscode/                                                                        
+*.swp                                                                           
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db                                                                       
+                                                                                
+# Secrets - CRITICAL                                                            
+.env                                                                            
+.env.*                                                                          
+*.env                                                                           
+*_secret*                                                                       
+*_secrets*                                                                      
+credentials.json                                                                
+*.pem                                                                           
+*.key                                                                           
+secrets/                                                                        
+                                                                                
+# Logs (optional - may contain sensitive data)                                  
+*.log
+*.tmp
+temp/                                                                           
+                                                                                
+# Build artifacts                                                               
+dist/                                                                           
+build/                                                                          
+*.egg-info/                                                                     
+                                                                                
+# Jupyter                                                                       
+.ipynb_checkpoints/                                                             
+                                                                                
+# Local notes (optional)                                                        
+PRIVATE_NOTES.md                                                                
+personal/
+private/
