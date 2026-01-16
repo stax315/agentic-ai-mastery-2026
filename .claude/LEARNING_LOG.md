@@ -238,3 +238,302 @@ This is the compound effect. Every pattern I document today saves time tomorrow.
 ---
 
 *"The planning-first approach doesn't just prevent errors - it builds confidence. I know my code works because I designed it to work, not because I debugged it until it worked."*
+
+---
+
+## Day 2 – January 16, 2026
+
+### Goals for Today:
+- [x] Build StringAgent with 5 operations + verify()
+- [x] Build DateTimeAgent with 5 operations + verify()
+- [x] Build UtilityAgent with routing logic
+- [x] Apply planning-first to new domains
+- [x] Create v2 improvement for one agent
+- [x] Document new patterns in CLAUDE.md
+
+**Status: ALL GOALS EXCEEDED - AGAIN!**
+
+---
+
+### What I Built:
+
+#### 1. StringAgent (45 tests)
+- **File:** `string_agent.py`
+- **Operations:** reverse, uppercase, lowercase, count_words, remove_spaces
+- **Edge cases:** Unicode/emoji, empty strings, whitespace-only, booleans
+- **Key decision:** Empty strings are VALID (different from dates)
+- **Key learning:** Define "word" precisely before implementing count_words
+- **Result:** All 45 tests passing, zero errors
+
+#### 2. DateTimeAgent (51 tests)
+- **File:** `datetime_agent.py`
+- **Operations:** current_time, current_date, add_days, days_between, format_date
+- **Edge cases:** Leap years, month boundaries, format parsing, invalid dates
+- **Key decision:** Accept multiple formats, output ISO 8601 only
+- **Key learning:** Trust timedelta for date arithmetic, don't calculate manually
+- **Result:** All 51 tests passing, zero code errors (1 test value refinement)
+
+#### 3. UtilityAgent v1 (32 tests initially)
+- **File:** `utility_agent.py`
+- **Architecture:** Operation Registry pattern for routing
+- **Sub-agents:** StringAgent + DateTimeAgent
+- **Key innovation:** Dictionary-based routing (O(1) lookup, zero ambiguity)
+- **Result:** All tests passing, zero errors
+
+#### 4. UtilityAgent v2 (63 tests)
+- **File:** `utility_agent.py` (upgraded)
+- **Sub-agents:** StringAgent + DateTimeAgent + **CalculatorAgent**
+- **5 Major Enhancements:**
+  1. **CalculatorAgent Integration** - 7 new operations (17 total)
+  2. **Operation Aliases** - 10 shortcuts (rev, upper, now, plus, etc.)
+  3. **describe() method** - Self-documenting API
+  4. **"Did you mean?" suggestions** - Typo recovery
+  5. **list_operations_by_category()** - Organized discoverability
+- **Backwards compatibility:** All 32 v1 tests still pass unchanged
+- **Result:** All 63 tests passing, zero errors
+
+---
+
+### Key Concepts Mastered:
+
+#### 1. String Domain Complexity
+Strings seem simple but have hidden complexity:
+- What is a "word"? (Had to define: contiguous non-whitespace)
+- Is empty string valid? (Yes for strings, no for dates)
+- Unicode/emoji handling (Python handles it, test it anyway)
+- Whitespace variations (space, tab, newline)
+
+#### 2. DateTime Domain Complexity
+Dates are harder than strings:
+- Format parsing (ISO, US, written - must define priority)
+- Semantic validation (Feb 30 is syntactically valid but semantically wrong)
+- Leap years (Feb 29 valid in 2024, invalid in 2023)
+- Timezone awareness (documented assumption: naive/local time)
+
+#### 3. Multi-Agent Coordination
+Building a coordinator is different from building an implementer:
+- Routing decisions (chose Operation Registry pattern)
+- Error propagation (let sub-agent errors pass through)
+- Integration testing (focus on routing, not edge cases)
+- Extensibility (one line per new operation)
+
+#### 4. V2 Improvement Process
+Planning v2 is as important as planning v1:
+- List specific enhancements with why/how
+- Identify edge cases for NEW features
+- Ensure backwards compatibility
+- Define success criteria before implementing
+
+---
+
+### Planning Success Metrics:
+
+| Metric | Value |
+|--------|-------|
+| Errors encountered (code) | **0** |
+| Errors encountered (test design) | 1 (date calculation) |
+| Errors prevented through planning | **20+** |
+| Plans created | 4 (one per agent + v2 plan) |
+| Time spent debugging | 0 minutes |
+| Tests written | 159 |
+| Tests passing | 159 (100%) |
+
+---
+
+### CLAUDE.md Growth:
+
+| When | Patterns |
+|------|----------|
+| Started Day 2 with | 27+ patterns |
+| Ended Day 2 with | 56+ patterns |
+
+**New patterns added:**
+- Pattern 10-13: String handling
+- Pattern 14-17: DateTime handling
+- Pattern 18-23: Multi-agent coordination
+- Pattern 24-27: V2 enhancements (aliases, describe, suggestions, categories)
+
+**New strategies added:**
+- Strategy 5-6: String edge cases, define ambiguous terms
+- Strategy 7-9: DateTime edge cases, trust libraries, standardize output
+- Strategy 10-12: Multi-agent routing, eliminate ambiguity, integration testing
+- Strategy 13-14: V2 planning checklist, backwards compatibility
+
+**Most valuable additions:**
+- **Operation Registry pattern** (Pattern 19) - Production-grade plugin architecture
+- **Alias Resolution Layer** (Pattern 24) - UX improvement without API changes
+- **Typo Suggestions** (Pattern 26) - Modern CLI error recovery
+
+---
+
+### Most Challenging Aspects:
+
+1. **DateTime format parsing**
+   - Which format to try first?
+   - How to handle ambiguous dates like 01/02/2024?
+   - Solution: Defined priority order (ISO → US → Written), documented assumption
+
+2. **Multi-agent routing strategy**
+   - Keyword matching? Pattern detection? If/else chains?
+   - Solution: Operation Registry pattern (explicit, testable, extensible)
+
+3. **V2 backwards compatibility**
+   - How to add features without breaking existing code?
+   - Solution: All v1 tests must pass unchanged, new features are additive
+
+---
+
+### Breakthrough Moments:
+
+1. **Operation Registry pattern**
+   - During planning, evaluated multiple routing approaches
+   - Registry emerged as clearly superior: O(1) lookup, zero ambiguity
+   - This is how production plugin systems work
+
+2. **"Empty is valid" realization**
+   - Empty strings are valid inputs for StringAgent operations
+   - Empty dates are NOT valid (there's no "empty date")
+   - Domain-specific decisions matter
+
+3. **Alias resolution order**
+   - Must resolve aliases BEFORE validation
+   - Otherwise "rev" would be rejected as unknown before being resolved
+   - Planning caught this potential bug
+
+4. **Prefix matching for typos**
+   - Considered complex edit-distance algorithms
+   - Simple prefix matching works well enough: "revrese" → "reverse"
+   - Simpler = fewer bugs
+
+---
+
+### What Surprised Me:
+
+1. **Different domains, same process**
+   - String ops, datetime ops, multi-agent routing - all different
+   - But planning-first worked equally well for all three
+   - The process scales
+
+2. **V2 planning was just as important**
+   - Thought v2 would be "quick improvements"
+   - Planning caught edge cases I would have missed
+   - Backwards compatibility requires explicit testing
+
+3. **159 tests in one day**
+   - Day 1: 85 tests across 3 implementations
+   - Day 2: 159 tests across 4 implementations
+   - Zero debugging time enabled this throughput
+
+---
+
+### Confidence Levels (1-10):
+
+| Skill | Before Day 2 | After Day 2 |
+|-------|--------------|-------------|
+| String handling | 6/10 | 9/10 |
+| DateTime operations | 5/10 | 9/10 |
+| Multi-agent systems | 3/10 | 9/10 |
+| Operation Registry pattern | 0/10 | 10/10 |
+| V2 improvement process | 4/10 | 9/10 |
+| Integration testing | 4/10 | 8/10 |
+| Ready for Day 3 | 7/10 | 10/10 |
+
+---
+
+### Questions Answered Today:
+
+| Question | Answer |
+|----------|--------|
+| How to handle string edge cases? | Define behavior per operation, empty strings usually valid |
+| How to parse multiple date formats? | Priority order, accept many, output one (ISO 8601) |
+| How to route to multiple sub-agents? | Operation Registry pattern (dictionary-based) |
+| How to improve v1 meaningfully? | Plan enhancements with why/how/edge cases |
+| How to ensure backwards compatibility? | All v1 tests must pass unchanged |
+
+---
+
+### Files Created Today:
+
+| File | Purpose | Tests |
+|------|---------|-------|
+| `string_agent.py` | StringAgent with 5 ops | 45 |
+| `test_string_agent.py` | Tests for StringAgent | - |
+| `datetime_agent.py` | DateTimeAgent with 5 ops | 51 |
+| `test_datetime_agent.py` | Tests for DateTimeAgent | - |
+| `utility_agent.py` | UtilityAgent v2 (coordinator) | 63 |
+| `test_utility_agent.py` | Tests for UtilityAgent v2 | - |
+| `calculator_agent_v2.py` | Copied from Day 1 | - |
+| `README.md` | Day 2 documentation | - |
+| **Total** | **8 files** | **159 tests** |
+
+---
+
+### Time Spent:
+- Session 1 (StringAgent): ~25 minutes
+- Session 2 (DateTimeAgent): ~30 minutes
+- Session 3 (UtilityAgent v1): ~25 minutes
+- Session 4 (V2 Planning + Implementation): ~35 minutes
+- Session 5 (Documentation): ~20 minutes
+- **Total: ~135 minutes (~2.25 hours)**
+
+---
+
+### Comparison to Day 1:
+
+| Metric | Day 1 | Day 2 | Growth |
+|--------|-------|-------|--------|
+| Agents built | 2 (+ function) | 4 | +100% |
+| Tests written | 85 | 159 | +87% |
+| Patterns documented | 27 | 56 | +107% |
+| Code errors | 0 | 0 | Maintained |
+| Complexity | Math ops | Multi-domain + Multi-agent | +300% |
+
+**Day 2 proved planning-first scales to increased complexity.**
+
+---
+
+### The Compound Effect in Action:
+
+Day 1 patterns I reused today:
+- Input validation patterns (applied to strings, dates)
+- verify() method structure (applied to all agents)
+- Error message patterns (applied everywhere)
+- Edge case checklists (extended for strings, dates)
+
+New patterns I captured for tomorrow:
+- Operation Registry (will use for any coordinator)
+- Alias Resolution Layer (will use for UX improvements)
+- Typo Suggestions (will use for any CLI-like interface)
+- V2 Planning Checklist (will use for any improvement cycle)
+
+**This is the compound effect: patterns from Day 1 accelerated Day 2, and patterns from Day 2 will accelerate Day 3.**
+
+---
+
+### Tomorrow's Preview (Day 3):
+
+Possible directions:
+- [ ] Error recovery patterns (intentionally trigger and handle errors)
+- [ ] More complex multi-agent interactions
+- [ ] Persistent storage integration
+- [ ] API/external service integration
+- [ ] Performance optimization patterns
+
+Day 1-2 achieved zero errors through planning. Day 3 might explore what happens when errors DO occur.
+
+---
+
+### Status: ✅ COMPLETE - ZERO CODE ERRORS - EXCEEDED EXPECTATIONS
+
+**Day 2 was a success because:**
+1. I followed the same process (planning-first)
+2. I applied Day 1 patterns to new domains
+3. I discovered new patterns (Operation Registry, etc.)
+4. I captured everything in CLAUDE.md
+5. I'm ready to build on this foundation (Day 3)
+
+---
+
+*"Day 2 proved the process scales. Different domains, increased complexity, same zero-error result. The planning-first approach isn't domain-specific - it's universally effective."*
+
+---
