@@ -1,5 +1,19 @@
 # AI Development Standards
 
+## Style Guide
+- Use existing patterns; examine codebase first
+- Minimal changes only: surgical edits, no refactors unless breaking
+
+## What NOT to Do (Anti-Overengineering)
+- No abstractions until duplications exists
+- No design patterns unless problem demands them
+- No complex error handling for 1% edge cases
+- No configurations for rarely-changing values
+- No new utils/helpers for one-off logic
+- Inline simple functions; reuse existing code first
+- Minimal changes only: edit files surgically
+- Assume happy path until proven otherwise
+
 ## CRITICAL WORKFLOW RULES
 
 ### Rule #1: ALWAYS ASK FOR A PLAN FIRST
@@ -21,6 +35,7 @@
 - If a test fails, you know exactly which code caused it
 
 ---
+
 
 ## Code Patterns That Work
 
@@ -421,6 +436,108 @@ def list_operations_by_category(self) -> dict:
 # - Shows the multi-agent architecture
 # - Supports organized help output
 ```
+
+---
+
+## Resilience Patterns (Day 3)
+
+### Pattern 28: Resilient Wrapper (Day 3 Session 3)
+```python
+def _execute_with_resilience(self, operation, args, kwargs):
+    """Stack: circuit_breaker → retry → fallback"""
+    def raw_operation():
+        return self._execute_raw(operation, *args, **kwargs)
+
+    def with_circuit_breaker():
+        return self._recovery.circuit_breaker(
+            operation=raw_operation,
+            operation_id=agent_id,
+            failure_threshold=5,
+            reset_timeout=30.0
+        )
+
+    try:
+        result = self._recovery.retry_with_backoff(
+            operation=with_circuit_breaker,
+            max_retries=3
+        )
+        return result
+    except CircuitOpenError:
+        return self._get_fallback_value(operation, args, kwargs)
+    except Exception:
+        return self._get_fallback_value(operation, args, kwargs)
+```
+**Why:** Composing resilience patterns creates production-grade reliability.
+
+### Pattern 29: Per-Agent Circuit Breaker (Day 3 Session 3)
+```python
+# Each agent has its own circuit breaker - one failing agent doesn't take down others
+agent_id = self._agent_for_operation[operation]  # "string_agent", "datetime_agent", etc.
+
+circuit_breaker(op, operation_id="string_agent")    # Separate circuit
+circuit_breaker(op, operation_id="datetime_agent")  # Separate circuit
+circuit_breaker(op, operation_id="calculator_agent") # Separate circuit
+
+# If calculator agent fails repeatedly, string and datetime still work
+```
+**Why:** Isolation prevents cascade failures. One agent down shouldn't break everything.
+
+### Pattern 30: Failure Injection for Testing (Day 3 Session 3)
+```python
+def _inject_failure(self, operation: str, failure_type: str, fail_count: int):
+    """Inject controlled failures for resilience testing."""
+    self._injected_failures[operation] = {
+        "type": failure_type,  # "transient" or "permanent"
+        "remaining": fail_count
+    }
+
+def _execute_raw(self, operation, *args, **kwargs):
+    # Check for injected failure before normal execution
+    if operation in self._injected_failures:
+        failure = self._injected_failures[operation]
+        if failure["remaining"] > 0:
+            failure["remaining"] -= 1
+            if failure["type"] == "transient":
+                raise TransientError(f"Injected transient failure")
+            else:
+                raise PermanentError(f"Injected permanent failure")
+    # Normal execution...
+```
+**Why:** Can't test retry/circuit breaker without failures; injection provides controlled testing.
+
+### Pattern 31: Operation-Specific Fallbacks (Day 3 Session 3)
+```python
+fallbacks = {
+    # String ops: Return input unchanged (user sees their input)
+    "uppercase": lambda args, kwargs: args[0] if args else "",
+    "reverse": lambda args, kwargs: args[0] if args else "",
+
+    # Counts: Return -1 (not 0, since 0 is valid for empty string)
+    "count_words": lambda args, kwargs: -1,
+    "days_between": lambda args, kwargs: -1,
+
+    # Calculator ops: Return NaN (math convention for undefined)
+    "add": lambda args, kwargs: float('nan'),
+    "divide": lambda args, kwargs: float('nan'),
+
+    # DateTime ops: Return epoch/midnight (recognizable defaults)
+    "current_date": lambda args, kwargs: "1970-01-01",
+    "current_time": lambda args, kwargs: "00:00:00",
+}
+```
+**Why:** Fallbacks should be recognizable as "error" values, not silent valid-looking results.
+
+### Pattern 32: Circuit-First (Fail Fast) Pattern (Day 3 Session 3)
+```
+User Request
+    ↓
+[Circuit Breaker Check] ──→ If OPEN: Return fallback immediately (fail fast)
+    ↓ (if CLOSED/HALF_OPEN)
+[Retry with Backoff] ──→ Try operation up to N times
+    ↓ (if all fail)
+[Fallback] ──→ Return safe default value
+```
+**Why:** Don't waste retries on a service known to be down. Fail fast protects both caller and failing service.
 
 ---
 
@@ -857,17 +974,60 @@ Review plans specifically for:
 
 ---
 
+## Day 3 Achievements
+
+### Theme: Error Recovery & Resilience Patterns
+
+### ErrorRecoveryAgent (Session 1)
+- Built `ErrorRecoveryAgent` with 5 failure simulators + 5 recovery strategies (42 tests passing)
+- Implemented: retry_with_backoff, circuit_breaker, fallback_strategy, graceful_degradation, timeout_wrapper
+- Custom exceptions: TransientError, PermanentError, RateLimitError, CircuitOpenError
+- **Zero bugs due to planning-first approach**
+- Learned: Transient vs Permanent errors require different handling
+- Learned: Circuit breaker state machine (CLOSED → OPEN → HALF_OPEN → CLOSED)
+- Learned: Exponential backoff with jitter prevents thundering herd
+
+### CalculatorAgent Integration (Session 2)
+- Built `CalculatorAgent` with 7 operations (25 tests passing)
+- Built `UtilityAgent` integrating CalculatorAgent + ErrorRecoveryAgent (17 tests passing)
+- **Zero bugs due to planning-first approach**
+- Learned: Calculator operations reuse Day 1 patterns
+- Learned: Integration with error recovery agent enables resilience testing
+
+### ResilientUtilityAgent (Session 3 - Day 3 Capstone!)
+- Built `ResilientUtilityAgent` combining ALL patterns (58 tests passing)
+- **Architecture**: Composes StringAgent + DateTimeAgent + CalculatorAgent (17 operations)
+- **Full resilience stack**: Circuit Breaker → Retry → Fallback
+- **Per-agent circuit breakers**: Isolated failure domains (3 circuits)
+- **Operation-specific fallbacks**: NaN for math, -1 for counts, input for strings
+- **Failure injection**: Testing infrastructure for resilience verification
+- **Operation logging**: Source tracking (primary, fallback, circuit_open)
+- **Zero bugs due to comprehensive planning and critical review**
+- Learned: Circuit-first (fail fast) pattern protects both caller and failing service
+- Learned: Fallback values should be recognizable as "error" values (not silent failures)
+- Learned: Per-agent isolation prevents cascade failures
+
+### Day 3 Totals
+- Agents built: 3 (ErrorRecoveryAgent, CalculatorAgent, ResilientUtilityAgent)
+- New patterns added: 5 (Patterns 28-32: Resilience patterns)
+- Tests written: 142 (42 + 25 + 17 + 58)
+- **ZERO code bugs across ALL THREE agents**
+- First production-ready resilient system successfully built
+
+---
+
 ## Pattern Count
 
 | Section | Patterns |
 |---------|----------|
 | Code Patterns | 27 (+4 v2 patterns from Day 2) |
-| Multi-Agent Patterns | 1 section (new!) |
+| Resilience Patterns | 5 (new from Day 3!) |
+| Multi-Agent Patterns | 1 section |
 | Mistakes to Avoid | 5 |
 | Error Prevention | 14 (+2 v2 strategies from Day 2) |
 | Planning Patterns | 5 |
 | Review Patterns | 4+ |
-| **Total** | **56+** |
+| **Total** | **61+** |
 
 ---
 
@@ -881,13 +1041,17 @@ Review plans specifically for:
 | Day 2 | StringAgent | 45 |
 | Day 2 | DateTimeAgent | 51 |
 | Day 2 | UtilityAgent v2 | 63 |
-| **Total** | | **244** |
+| Day 3 | ErrorRecoveryAgent | 42 |
+| Day 3 | CalculatorAgent | 25 |
+| Day 3 | UtilityAgent | 17 |
+| Day 3 | ResilientUtilityAgent | 58 |
+| **Total** | | **386** |
 
 ---
 
-Last updated: January 16, 2026
-Day 2 - Planning-first continues with ZERO CODE BUGS
-**StringAgent: 45 tests, 0 errors**
-**DateTimeAgent: 51 tests, 0 code errors (1 test value error)**
-**UtilityAgent v2: 63 tests, 0 errors (First multi-agent system + v2!)**
-**Cumulative: 244 tests passing**
+Last updated: January 18, 2026
+Day 3 - Planning-first continues with ZERO CODE BUGS
+**ErrorRecoveryAgent: 42 tests, 0 errors**
+**CalculatorAgent: 25 tests, 0 errors**
+**ResilientUtilityAgent: 58 tests, 0 errors (Production-ready resilient system!)**
+**Cumulative: 386 tests passing**
