@@ -1,4 +1,31 @@
 """
+ADVANCED PROTOTYPE - Built during Week 1 (early)
+
+Revisit: Week 17-20 (Production Patterns phase)
+
+Context: Built this before completing foundational patterns.
+Contains production-grade concepts (resilience wrapper, per-agent circuit
+isolation, failure injection) that should be studied after mastering basics.
+
+Original build date: January 18, 2026
+Roadmap position when built: Week 1 Day 3
+Appropriate roadmap position: Week 17-20
+
+Patterns to extract:
+- Resilient wrapper (Circuit Breaker -> Retry -> Fallback layering)
+- Per-agent circuit breaker isolation
+- Recognizable fallback values (NaN for calc, epoch for dates)
+- Failure injection for testing resilience
+- Operation logging with source tracking
+- Configurable retry/circuit settings
+
+Why saved: Excellent implementation of full resilience stack, built out of sequence.
+Preserving for pattern study after foundations complete.
+
+================================================================================
+ORIGINAL DOCSTRING:
+================================================================================
+
 ResilientUtilityAgent - Production-ready multi-agent coordinator.
 
 Day 3 Session 3 - Combines ALL patterns into production-ready system.

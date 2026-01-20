@@ -1,4 +1,31 @@
 """
+ADVANCED PROTOTYPE - Built during Week 1 (early)
+
+Revisit: Week 17-20 (Production Patterns phase)
+
+Context: Built this before completing foundational patterns.
+Contains production-grade concepts (circuit breaker, exponential backoff,
+failure injection) that should be studied after mastering basics.
+
+Original build date: January 17, 2026
+Roadmap position when built: Week 1 Day 3
+Appropriate roadmap position: Week 17-20
+
+Patterns to extract:
+- Custom exception hierarchy (TransientError vs PermanentError)
+- Circuit breaker state machine (CLOSED -> OPEN -> HALF_OPEN)
+- Exponential backoff with jitter
+- Fallback strategy with graceful degradation
+- Failure injection for deterministic testing
+- Timeout wrapper using threading
+
+Why saved: Excellent implementation of resilience patterns, built out of sequence.
+Preserving for pattern study after foundations complete.
+
+================================================================================
+ORIGINAL DOCSTRING:
+================================================================================
+
 ErrorRecoveryAgent - A teaching agent for resilience patterns.
 
 Day 3 Theme: Learning from Intentional Failures
