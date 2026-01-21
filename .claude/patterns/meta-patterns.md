@@ -178,3 +178,143 @@ Evidence that simplicity works:
 
 Last updated: January 19, 2026
 **Week 1 Complete: 13 agents, 425 tests, 0 bugs**
+
+---
+
+## The 80/20 Complexity Rule
+
+### Discovery: Day 5 (ErrorRecoveryAgent analysis)
+
+Production agents often exhibit 10x complexity ratios:
+- Simple version: ~80 LOC, handles ~80% of use cases
+- Production version: ~800 LOC, handles remaining 20% (edges/scale/resilience)
+
+### The Pattern:
+
+```
+1. Build V0.1 (simple) first
+2. Deploy to low-stakes environment
+3. Wait for pain points to emerge
+4. Add complexity ONLY to solve felt pain
+5. Repeat until production-ready
+```
+
+### Anti-Pattern:
+
+Building V1.0 (production) first without experiencing V0.1 limitations:
+- Don't know which complexity is essential
+- Can't distinguish defensive vs. unnecessary code
+- Miss simpler solutions that would work
+
+### Validation:
+
+| Version | LOC | Complexity Layers | Use Cases Covered |
+|---------|-----|-------------------|-------------------|
+| V0.1 (SimpleRetryAgent) | 80 | 0 | ~80% |
+| V1.0 (ErrorRecoveryAgent) | 850 | 6 | ~100% |
+| **Difference** | **770** | **6** | **20%** |
+
+The 770 LOC difference = defensive programming for scale, not core function.
+
+### Application:
+
+Every new agent/system should start at V0.1 (≤100 LOC).
+Add complexity only when limitations become painful.
+
+| Complexity | When to Add |
+|------------|-------------|
+| Exponential backoff | After experiencing retry storms |
+| Circuit breaker | After prolonging outages by hammering |
+| Custom exceptions | After wasting retries on permanent errors |
+| Metrics | After needing production visibility |
+| Fallback strategies | After all-or-nothing failures hurt users |
+
+### Key Insight:
+
+> **You can't know which complexity is essential until you've felt the pain of its absence.**
+>
+> Building simple first isn't slower - it's the only way to build the RIGHT complexity.
+
+---
+
+## Planning-First Universal Principle
+
+### Discovery (Day 5)
+
+Planning-first isn't code-specific - it's process-specific.
+
+**Day 5 applied planning-first to code review:**
+- Planned review methodology (Complexity Layer Analysis)
+- Planned design process (constraints, criteria, templates)
+- Executed systematically
+- Zero errors in review
+
+### The Universal Pattern
+
+ANY systematic work benefits from:
+
+```
+1. Plan the methodology   → HOW will I approach this?
+2. Define success criteria → HOW will I know I'm done?
+3. Create structured template → WHAT sections/output do I need?
+4. Execute the plan       → DO the work systematically
+5. Verify against criteria → CHECK completeness
+```
+
+### Proof Points
+
+| Day | Task | Planning Applied | Result |
+|-----|------|------------------|--------|
+| Day 1-2 | Writing code | Planned features, edge cases, tests | Zero bugs |
+| Day 5 | Reviewing code | Planned methodology, criteria, template | Actionable spec |
+| Day 5 | Designing systems | Planned constraints, progression map | Reusable framework |
+
+### Applications Beyond Code
+
+| Activity | How to Plan-First |
+|----------|-------------------|
+| Code reviews | Define what to look for, success criteria, output format |
+| Documentation | Define audience, sections needed, verification method |
+| Learning sessions | Define objectives, materials, how to verify understanding |
+| Debugging | Define hypotheses, test order, success criteria |
+| Refactoring | Define scope, what NOT to change, verification tests |
+| Architecture decisions | Define constraints, options to evaluate, decision criteria |
+
+### Why It Works
+
+1. **Prevents drift** - Know what "done" looks like before starting
+2. **Catches gaps early** - Success criteria reveal missing elements
+3. **Enables verification** - Can check completeness objectively
+4. **Creates reusable outputs** - Templates work for future similar tasks
+5. **Reduces cognitive load** - Don't think about structure while doing content
+
+### The Meta-Insight
+
+> **Rule #1 (ALWAYS PLAN FIRST) is not a coding rule.**
+> **It's a thinking rule that happens to apply especially well to coding.**
+
+Planning prevents errors in ANY systematic work because:
+- It forces clarity about goals before action
+- It separates "what to do" from "how to do it"
+- It creates checkpoints for verification
+- It makes implicit assumptions explicit
+
+### Day 5 Deliverables as Proof
+
+| Deliverable | Planning Element | Value Created |
+|-------------|------------------|---------------|
+| Review Methodology | Framework selection, success criteria | Reusable for future reviews |
+| Design Process | Constraints, decision criteria | Reusable for future designs |
+| Simple Version Spec | Template structure | Actionable implementation guide |
+| Progression Map | V0.1 → V1.0 pathway | Learning roadmap |
+
+---
+
+### Key Quote
+
+*"Planning-first isn't about code - it's about systematic thinking. Any task worth doing is worth planning first."*
+
+---
+
+Last updated: January 20, 2026
+Day 5: Planning-First Universal Principle discovered
