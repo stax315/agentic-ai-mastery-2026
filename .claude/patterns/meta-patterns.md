@@ -316,5 +316,149 @@ Planning prevents errors in ANY systematic work because:
 
 ---
 
-Last updated: January 20, 2026
-Day 5: Planning-First Universal Principle discovered
+## Experiential Learning Pattern
+
+### Discovery: Day 6 (SimpleRetryAgent stress testing)
+
+**The Gap Between Thinking and Feeling:**
+
+Intellectual understanding (Day 5):
+- Code review reveals what patterns do
+- Analysis shows why patterns exist
+- Documentation explains how patterns work
+
+Experiential understanding (Day 6):
+- Building reveals when patterns are needed
+- Stress testing shows which patterns matter most
+- Watching failures creates visceral motivation
+
+**Both necessary. Different knowledge types.**
+
+### The Screaming Test:
+
+If watching a system fail makes you want to scream
+"STOP DOING THAT!", you've found a critical pattern gap.
+
+Example: Watching identical permanent errors retry with
+fixed delays → screaming "IT'S THE SAME ERROR!" →
+error classification goes from nice-to-have to critical.
+
+### Priority Inversion Phenomenon:
+
+Theoretical analysis tends to prioritize by:
+- Complexity (harder = more important?)
+- Completeness (what's missing in V1.0?)
+- Sophistication (what's "advanced"?)
+
+Experiential testing prioritizes by:
+- Pain level (what hurts most to watch?)
+- Waste magnitude (what's most inefficient?)
+- Obviousness (what makes you yell at screen?)
+
+**The second prioritization is usually better.**
+
+### Application:
+
+Before adding complexity to any system:
+1. Build simplest version (V0.1)
+2. Stress test until failures observed
+3. Quantify waste (time, resources, user pain)
+4. Prioritize additions by pain level, not theory
+5. Add ONE layer at a time
+6. Repeat stress test to validate improvement
+
+### Day 6 Validation:
+
+Built SimpleRetryAgent V0.1 (80 LOC, simple retry)
+Stress tested: 3 scenarios, 4 limitations discovered
+Pain-based priority: Error classification #1 (9/10 pain)
+NOT complexity-based: Circuit breaker is simpler but lower pain
+
+Result: Tomorrow's Day 7 roadmap driven by felt experience,
+not theoretical importance.
+
+### The 100% Waste Principle:
+
+Systems that produce 100% waste are viscerally unacceptable
+in a way that systems with partial waste aren't.
+
+| Efficiency | Human Response |
+|------------|----------------|
+| 50% | "Could be better" |
+| 25% | "Should probably fix this" |
+| 0% | "THIS MUST BE FIXED NOW" |
+
+This explains why error classification (preventing 100% waste
+on permanent errors) topped Day 7 priorities despite not
+being the most complex feature.
+
+### Key Quote:
+
+*"Code review gives knowledge. Stress testing gives conviction."*
+
+---
+
+## Review Sequencing Pattern
+
+### Discovery: Day 6 Session 3.5
+
+**Review Timing Affects Insight Depth:**
+
+Traditional sequence:
+1. Build code
+2. Review code (abstract quality assessment)
+3. Test code (discover limitations)
+Result: Review lacks pain context
+
+Learning-optimized sequence:
+1. Build code
+2. **Stress test code** (experience limitations)
+3. **THEN review code** (with pain context fresh)
+4. Reflect on both
+Result: Review reveals WHY pain exists in code
+
+### The Difference:
+
+**Pre-stress review:**
+- "except Exception is fine for now"
+- General code quality lens
+- Abstract principles applied
+
+**Post-stress review:**
+- "THIS is why we need error classification"
+- Pain-informed lens
+- Limitations obvious in code structure
+
+### Why Post-Stress Review Is Better:
+
+When you've just watched the code fail:
+- Catch-all exception handling becomes obviously problematic
+- Fixed delays become visibly wasteful
+- Missing features scream from the code
+- "TODO: Add later" becomes "THIS IS CAUSING PAIN"
+
+### Application:
+
+For learning contexts (not production):
+1. Build simple version
+2. **Stress test first** (create pain context)
+3. **Review second** (with fresh pain awareness)
+4. Reflect on code + experience together
+
+For production contexts:
+- Still review before deploying
+- But consider stress testing in staging first
+- Pain context improves review quality
+
+### Day 6 Proof:
+
+Code review quality rating: 8/10
+Most valuable finding: "Code review after stress testing
+reveals WHY pain exists, not just THAT code has issues"
+
+Review timing sequence now added to systematic process.
+
+---
+
+Last updated: January 21, 2026
+Day 6: Review Sequencing Pattern discovered
